@@ -1,0 +1,24 @@
+# Node modules
+node_modules/
+
+# Logy
+logs
+*.log
+npm-debug.log*
+
+# Env proměnné
+.env
+
+# Prisma SQLite databáze
+prisma/dev.db
+prisma/dev.db-journal
+
+# Upload složka (např. obrázky)
+uploads/
+
+# Build výstupy (např. pokud buildíš do dist)
+dist/
+
+# Lokální tunel a deploy scripty
+cf-tunnel.sh
+deploy.sh

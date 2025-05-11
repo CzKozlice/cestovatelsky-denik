@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum GenderType {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum TripRole {
+  CREATOR
+  COOWNER
+  MEMBER
+  VIEWER
+}
+
+enum PostType {
+  TEXT
+  IMAGE
+  LOCATION
+}
+
+model User {
+  id        String     @id @default(cuid())
+  username  String     @unique
+  email     String     @unique
+  password  String
+  bio       String?
+  firstname String
+  surname   String
+  birthday  DateTime
+  gender    GenderType
+  country   String
+  phone     String?
+  avatarUrl String?
+
+  trips TripUser[]
+  posts Post[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Trip {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  location    String?
+  startDate   DateTime?
+  endDate     DateTime?
+
+  participants TripUser[]
+  posts        Post[]
+  countries    TripCountry[]
+
+  tasks        Task[]
+  packingItems PackingItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Country {
+  id    String        @id @default(cuid())
+  name  String        @unique
+  code  String        @unique
+  trips TripCountry[]
+}
+
+model TripCountry {
+  tripId    String
+  countryId String
+
+  trip    Trip    @relation(fields: [tripId], references: [id])
+  country Country @relation(fields: [countryId], references: [id])
+
+  @@id([tripId, countryId])
+}
+
+model TripUser {
+  trip   Trip     @relation(fields: [tripId], references: [id])
+  user   User     @relation(fields: [userId], references: [id])
+  role   TripRole
+  tripId String
+  userId String
+
+  @@id([tripId, userId])
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  type      PostType
+  content   String?
+  imageUrl  String?
+  location  String?
+  createdAt DateTime @default(now())
+
+  tripId   String
+  authorId String
+
+  trip   Trip @relation(fields: [tripId], references: [id])
+  author User @relation(fields: [authorId], references: [id])
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  tripId      String
+  title       String
+  description String?
+  completed   Boolean  @default(false)
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  trip Trip @relation(fields: [tripId], references: [id])
+}
+
+model PackingItem {
+  id        String   @id @default(cuid())
+  tripId    String
+  title     String
+  completed Boolean  @default(false)
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  trip Trip @relation(fields: [tripId], references: [id])
+}
